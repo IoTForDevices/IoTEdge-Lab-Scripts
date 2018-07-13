@@ -1,7 +1,10 @@
 #!/bin/bash
 
-# Remove all VMs that were used for the EdgeLab
+# Remove all resources that were used for the EdgeLab
 
-az group delete --name IoTEdgeLab-RG --no-wait -y
-az group wait --name IoTEdgeLab-RG --deleted
+# Set Environment Variable (default name) for the Resource Group
+AZ_RG="IoTEdgeLab-RG"
+
+az group delete --name $AZ_RG --no-wait -y
+az group wait --name $AZ_RG --deleted
 
