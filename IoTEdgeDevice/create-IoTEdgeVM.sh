@@ -1,4 +1,6 @@
 #!/bin/bash
+# This script creates a Linux powered target VM for an IoT Edge Device
+# It also creates an IoTHub and an Azure Container Registry
 
 now=$(date +"%Y%m%d")
 
@@ -10,7 +12,7 @@ AZ_EDGE_DEV_VM="IoTEdgeDevVM"
 AZ_EDGE_ID="MyIoTEdgeDevice"
 AZ_LOC="westeurope"
 AZ_IOTHUB="IoTHub-MST-$now"
-AZ_ACR="ACR-MST-$now"
+AZ_ACR="ACRMST$now"
 
 # Check if the user wants to override one or more of the default values
 OPTS=`getopt -n 'parse-options' -o g:l:i:t:d:a: --long resource-group:,location:,iothub-name:,target-vm-name:,dev-vm-name:,acr-name: -- "$@"`
@@ -44,7 +46,7 @@ NIC_ID_DEV=$(az vm show -g $AZ_RG -n $AZ_EDGE_DEV_VM --query 'networkProfile.net
 SUBNET_ID=$(az network nic show --ids $NIC_ID_DEV -g $AZ_RG --query 'ipConfigurations[].subnet.id' -o tsv)
 
 # Create a VM with an Ubuntu image
-az vm create -g $AZ_RG -n $AZ_EDGE_VM --image Canonical:UbuntuServer:16.04-LTS:latest --subnet-id $SUBNET_ID --generate-ssh-keys --size Standard_B1ms --no-wait
+az vm create -g $AZ_RG -n $AZ_EDGE_VM --image Canonical:UbuntuServer:16.04-LTS:latest --subnet $SUBNET_ID --generate-ssh-keys --size Standard_B1ms --no-wait
 
 # Create an IoTHub (if you don't want to use an existing IoTHub) and register your IoTEdge device
 # TODO: Add switch to create or use existing
@@ -61,7 +63,11 @@ az vm wait -g $AZ_RG -n $AZ_EDGE_VM --created
 # Get VM information with queries and set environment variables with (virtual) network info
 NIC_ID_TARGET=$(az vm show -g $AZ_RG -n $AZ_EDGE_VM --query 'networkProfile.networkInterfaces[].id' -o tsv)
 
+echo $NIC_ID_TARGET
+
 IP_ID=$(az network nic show --ids $NIC_ID_TARGET -g $AZ_RG --query 'ipConfigurations[].publicIpAddress.id' -o tsv)
+
+IOTEDGEVM_IP_ADDR=$(az network public-ip show --ids $IP_ID -g $AZ_RG --query ipAddress -o tsv)
 
 # Install IoTEdge runtime on the newly created Azure IoT Edge Device and switch to the device
 ssh $IOTEDGEVM_IP_ADDR 'bash -s' < ./install-IoTEdgeRuntime.sh "'$IOTEDGE_DEVICE_CS'"
