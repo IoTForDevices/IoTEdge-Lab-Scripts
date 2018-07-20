@@ -55,6 +55,16 @@
               "image": "${MODULES.CSharpFilterModule.amd64}",
               "createOptions": ""
             }
+          },
+          "CSharpHumidityFilter": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.CSharpHumidityFilter.amd64}",
+              "createOptions": ""
+            }
           }
         }
       }
@@ -64,7 +74,9 @@
         "schemaVersion": "1.0",
         "routes": {
           "sensorToCSharpFilterModule": "FROM /messages/modules/tempSensor/outputs/temperatureOutput INTO BrokeredEndpoint(\"/modules/CSharpFilterModule/inputs/input1\")",
-          "CSharpFilterModuleToIoTHub": "FROM /messages/modules/CSharpFilterModule/outputs/output1 INTO $upstream"
+          "CSharpFilterModuleToIoTHub": "FROM /messages/modules/CSharpFilterModule/outputs/output1 INTO $upstream",
+          "CSharpFilterModuleToCSharpHumidityFilter": "FROM /messages/modules/CSharpFilterModule/outputs/output2 Into BrokeredEndpoint(\"/modules/CSharpHumidityFilter/inputs/input1\")",
+          "CSharpHumidityFilterToIoTHub": "FROM /messages/modules/CSharpHumidityFilter/outputs/* INTO $upstream"
         },
         "storeAndForwardConfiguration": {
           "timeToLiveSecs": 7200
@@ -73,7 +85,12 @@
     },
     "CSharpFilterModule": {
       "properties.desired": {
-        "TemperatureThreshold":103
+        "TemperatureThreshold": 103
+      }
+    },
+    "CSharpHumidityFilter": {
+      "properties.desired": {
+        "Humidity": 25
       }
     }
   }
