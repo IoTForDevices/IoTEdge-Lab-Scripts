@@ -13,6 +13,7 @@ Order and usage of the different scripts:
    | --resource-group or -g [resource group name]   | IoTEdgeLab-RG |
    | --location or -l [azure location]              | westeurope    |
    | --dev-vm-name or -d [Development Machine Name] | IoTEdgeDevVM  |
+   
    NOTE: The physical machine must have a bash shell and az cli installed. If the latter is not installed, it can be installed with the script **install-azure-cli.sh** that you will use later to install on the development machine as well.
 1. **InstallWindowsComponents.ps1** - This script, like all the following scripts as well, must be executed on the newly created Azure Virtual Machine. It does not take parameters and installs the Hyper-V and Linux Subsystem on Windows components, followed by a restart. After restarting, Ubuntu 16.04 must be installed from the Windows Store to be able to run a bash shell.
 1. **InstallEdgeDevTools.ps1** - This script installs all development tools that are needed to build IoT Edge Modules.
