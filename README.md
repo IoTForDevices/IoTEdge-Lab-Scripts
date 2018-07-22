@@ -21,7 +21,11 @@ Order and usage of the different scripts:
    az login
    az account set -- subscription < name or id >
    ```
-1. **InstallWindowsComponents.ps1** - This script, like all the following scripts as well, must be executed on the newly created Azure Virtual Machine. It does not take parameters and installs the Hyper-V and Linux Subsystem on Windows components, followed by a restart. After restarting, Ubuntu 16.04 must be installed from the Windows Store to be able to run a bash shell.
+1. **InstallWindowsComponents.ps1** - This script, like all the following scripts as well, must be executed on the newly created Azure Virtual Machine. It does not take parameters and installs the Hyper-V and Linux Subsystem on Windows components, followed by a restart. After restarting, Ubuntu 16.04 must be installed from the Windows Store to be able to run a bash shell. To execute the PowerShell script, make sure to change the execution policy, for instance by:
+
+   ```
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
+   ```
 
    NOTE: The easiest way to clone the lab repository is by installing [GitHub desktop for Windows](https://desktop.github.com/) on the the newly created development VM. The lab repository can be found here: https://github.com/mstruys/IoTEdge-Lab-Scripts.git.
 1. **InstallEdgeDevTools.ps1** - This script installs all development tools that are needed to build IoT Edge Modules.
