@@ -32,6 +32,9 @@ while true ; do
         esac
 done
 
+echo "Creating $AZ_EDGE_DEV_VM in resource group $AZ_RG"
+echo "Using the following IoTHub: $AZ_IOTHUB and ACR: $AZ_ACR"
+
 # Verify if the group already exists, if not: Create a new group, just for demo purpose
 AZ_GROUP=$(az group exists -n $AZ_RG)
 if [ $AZ_GROUP != true ]
@@ -48,22 +51,32 @@ SUBNET_ID=$(az network nic show --ids $NIC_ID_DEV -g $AZ_RG --query 'ipConfigura
 # Create a VM with an Ubuntu image
 az vm create -g $AZ_RG -n $AZ_EDGE_VM --image Canonical:UbuntuServer:16.04-LTS:latest --subnet $SUBNET_ID --generate-ssh-keys --size Standard_B1ms --no-wait
 
-# Create an IoTHub (if you don't want to use an existing IoTHub) and register your IoTEdge device
-# TODO: Add switch to create or use existing
-az iot hub create -g $AZ_RG -n $AZ_IOTHUB --sku S1
-az iot hub device-identity create -n $AZ_IOTHUB -d $AZ_EDGE_ID -ee
-IOTEDGE_DEVICE_CS=$(az iot hub device-identity show-connection-string -d $AZ_EDGE_ID -n $AZ_IOTHUB -o tsv)
+# Create an IoTHub (if you don't want to use an existing IoTHub)
+IOTHUB_FOUND=$(az iot hub list --query "[?name=='$AZ_IOTHUB'].name" -o tsv)
+if [ ! $IOTHUB_FOUND ]
+then
+        az iot hub create -g $AZ_RG -n $AZ_IOTHUB --sku S1
+fi
 
-# Create an Azure Container Registry
-az acr create -g $AZ_RG --name $AZ_ACR --sku Basic
+# Create an Azure IoT Edge Device Identity on your IoTHub if one does not yet exist
+IOTEDGE_DEV_FOUND=$(az iot hub device-identity list -n $AZ_IOTHUB --query "[?deviceId=='$AZ_EDGE_ID'].capabilities.iotEdge" -o tsv)
+if [ ! $IOTEDGE_DEV_FOUND ]
+then
+	az iot hub device-identity create -n $AZ_IOTHUB -d $AZ_EDGE_ID -ee
+fi
+
+# Create an Azure Container Registry if one does not yet exist
+ACR_FOUND=$(az acr list --query "[?name=='$AZ_ACR_NAME'].name" -o tsv)
+if [ ! $ACR_FOUND ]
+then
+	az acr create -g $AZ_RG --name $AZ_ACR --ksu Basic
+fi
 
 # Wait for the IoT Edge target VM to be created
 az vm wait -g $AZ_RG -n $AZ_EDGE_VM --created
 
 # Get VM information with queries and set environment variables with (virtual) network info
 NIC_ID_TARGET=$(az vm show -g $AZ_RG -n $AZ_EDGE_VM --query 'networkProfile.networkInterfaces[].id' -o tsv)
-
-echo $NIC_ID_TARGET
 
 IP_ID=$(az network nic show --ids $NIC_ID_TARGET -g $AZ_RG --query 'ipConfigurations[].publicIpAddress.id' -o tsv)
 
