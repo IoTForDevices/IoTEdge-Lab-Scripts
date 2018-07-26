@@ -2,7 +2,7 @@
 # This script creates a Linux powered target VM for an IoT Edge Device
 # It also creates an IoTHub and an Azure Container Registry
 
-set -x
+# Use this to get more debug info 'set -x'
 
 now=$(date +"%Y%m%d")
 
@@ -72,7 +72,7 @@ fi
 IOTEDGE_DEVICE_CS=$(az iot hub device-identity show-connection-string -d $AZ_EDGE_ID -n $AZ_IOTHUB -o tsv)
 
 # Create an Azure Container Registry if one does not yet exist
-ACR_FOUND=$(az acr list --query "[?name=='$AZ_ACR_NAME'].name" -o tsv)
+ACR_FOUND=$(az acr list --query "[?name=='$AZ_ACR'].name" -o tsv)
 if [ ! $ACR_FOUND ]
 then
 	echo "Creating a new ACR: $AZ_ACR"
