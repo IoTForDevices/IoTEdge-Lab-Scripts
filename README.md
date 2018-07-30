@@ -127,6 +127,32 @@ You will find sample code for two different filter modules, based on the followi
     },
 ```
 
+## Creating an Azure Fuction for your Azure IoT Edge Runtime
+
+In this section you will extend your existing IoT Edge Solution with an Azure Function.
+
+You can create an additional module in the same IoT Edge solution by right-clicking on the **modules** section in Visual Studio Code and selecting **Add IoT Edge Module**. This time, select an Azure Function and give your new module an appropriate name. Also, specify your ACR logon details. Leave the newly created module as is, but modify the routes inside the deployment.template.json to send messages with a pre-defined humidity on to the Azure Function. In the Azure Function, add a message property that indicates that the message has been send to the IoT Hub from the Azure Function. The routing information (with all previous modules present as well) should look like this:
+
+```
+    "$edgeHub": {
+      "properties.desired": {
+        "schemaVersion": "1.0",
+        "routes": {
+          "sensorToCSharpSampleModule": "FROM /messages/modules/tempSensor/outputs/temperatureOutput INTO BrokeredEndpoint(\"/modules/CSharpSampleModule/inputs/input1\")",
+          "CSharpSampleModuleToIoTHub": "FROM /messages/modules/CSharpSampleModule/outputs/output1 INTO $upstream",
+          "CSharpSampleModuleToNewSample": "FROM /messages/modules/CSharpSampleModule/outputs/output2 INTO BrokeredEndpoint(\"/modules/NewCSharpSampleModule/inputs/input1\")",
+          "NewCSharpSampleModuleToIoTHub": "FROM /messages/modules/NewCSharpSampleModule/outputs/output1 INTO $upstream",
+          "NewCSharpSampleModuleToAzureFunction": "FROM /messages/modules/NewCSharpSampleModule/outputs/output2 INTO BrokeredEndpoint(\"/modules/AzureFunctionSampleModule\")",
+          "AzureFunctionSampleModuleToIoTHub": "FROM /messages/modules/AzureFunctionSampleModule/outputs/* INTO $upstream"
+        },
+        "storeAndForwardConfiguration": {
+          "timeToLiveSecs": 7200
+        }
+      }
+    },
+
+```
+
 ### Lab Pre-requisites:
 - You must have a valid Azure Subscription
 - You must have a development machine (Linux or Windows with a linux subsystem) available to creaate / remotely connect to a Windows Development VM that will be created as part of running the scripts.
