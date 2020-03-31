@@ -1,6 +1,6 @@
 # IoTEdge-Lab-Scripts
 A collection of bash scripts to run an IoTEdge Lab.
-## Building the Lab Environment
+## Building the Lab Environment (based on Azure VMs)
 These scripts can be used to quickly setup a number of virtual machines
 - Windows Development VM with Visual Studio Code installed for IoT Edge Module Development
 - IoT Edge Host VM, powered by Ubuntu 16.04 LTS
@@ -50,6 +50,11 @@ To be able to run the IoTEdge Lab, you also need an IoT Hub. For test purposes, 
    **NOTE:** If you want to save the modules that you create as part of this lab, make sure to specify a permanent ACR registry instead of building one as part of this lab.
 
 All resources needed will be created in one single resource group. It is important to delete this resource group after being done with the lab. Otherwise you will continue to be charged for your VMs and for the IoT Hub. You can use the script **cleanup-IoTEdgeResources.sh** for this. This script cannot be executed from the Virtual Development machine, because that is one of the resources that will be removed by executing this script.
+
+
+## Building IoTEdge runtime on target (based on RPi3)
+
+t.b.d
 
 ## Creating Filter Modules to deploy to your Edge Runtime
 
