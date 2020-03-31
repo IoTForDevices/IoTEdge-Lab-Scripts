@@ -54,9 +54,21 @@ All resources needed will be created in one single resource group. It is importa
 
 ## Building IoTEdge runtime on target (based on RPi3)
 
-t.b.d
+This lab is based on running Azure IoT Edge on a Rasperry Pi 3 with Raspbian Buster. More information on how to setup Raspbian can be found in [this repository](https://github.com/IoTForDevices/IoT-Various-Demos/blob/master/Generic-prerequisites/Raspbian-Buster-IoTEdge-RP3/README.md#setting-up-azure-iot-edge-on-a-raspberry-pi-3-running-raspbian-buster).
+If you have Raspbian Buster already installed, go straight to the section to [install Docker and the Azure IoT Edge runtime](https://github.com/IoTForDevices/IoT-Various-Demos/blob/master/Generic-prerequisites/Raspbian-Buster-IoTEdge-RP3/README.md#install-docker-and-azure-iot-edge-on-raspbian-buster).
 
-## Creating Filter Modules to deploy to your Edge Runtime
+## Preparing your device for Creating Filter Modules to deploy to your Edge Runtime (developing in a Visual Studio Remote SSH session locally on the target machine)
+
+If you are developing on a Windows develoment machine, you can skip this step and immediately continue with the next step.
+
+To be able to develop modules on the target Raspberry Pi, you need to make sure to have the software installed:
+- [C# for Visual Studio Code (powered by OmniSharp) extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp)
+- .NET Core 3.1 SDK. The simplest way to install dotnet core is by downloading and executing the [bash script from here](https://dotnet.microsoft.com/download/dotnet-core/scripts).
+  - You can download it using `wget https://dotnetwebsite.azurewebsites.net/download/dotnet-core/scripts/v1/dotnet-install.sh`.
+  - After installing, link to the dotnet runtime by creating a soft link to it, using `sudo ln -s /home/pi/.dotnet/dotnet /usr/bin/dotnet`.
+- Continue with the next session
+
+## Creating Filter Modules to deploy to your Edge Runtime (platform independent)
 
 You will find sample code for two different filter modules, based on the following example: https://docs.microsoft.com/en-us/azure/iot-edge/tutorial-csharp-module in this repository. The following steps describe how to build these modules as part of the lab.
 
@@ -131,6 +143,7 @@ You will find sample code for two different filter modules, based on the followi
       }
     },
 ```
+
 
 ## Creating an Azure Fuction for your Azure IoT Edge Runtime
 

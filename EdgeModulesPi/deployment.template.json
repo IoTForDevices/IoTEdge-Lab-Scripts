@@ -1,0 +1,118 @@
+{
+  "$schema-template": "2.0.0",
+  "modulesContent": {
+    "$edgeAgent": {
+      "properties.desired": {
+        "schemaVersion": "1.0",
+        "runtime": {
+          "type": "docker",
+          "settings": {
+            "minDockerVersion": "v1.25",
+            "loggingOptions": "",
+            "registryCredentials": {
+              "iotedgecrmst01": {
+                "username": "$CONTAINER_REGISTRY_USERNAME_iotedgecrmst01",
+                "password": "$CONTAINER_REGISTRY_PASSWORD_iotedgecrmst01",
+                "address": "iotedgecrmst01.azurecr.io"
+              }
+            }
+          }
+        },
+        "systemModules": {
+          "edgeAgent": {
+            "type": "docker",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-agent:1.0",
+              "createOptions": {}
+            }
+          },
+          "edgeHub": {
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-hub:1.0",
+              "createOptions": {
+                "HostConfig": {
+                  "PortBindings": {
+                    "5671/tcp": [
+                      {
+                        "HostPort": "5671"
+                      }
+                    ],
+                    "8883/tcp": [
+                      {
+                        "HostPort": "8883"
+                      }
+                    ],
+                    "443/tcp": [
+                      {
+                        "HostPort": "443"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "modules": {
+          "CSharpModulePi": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.CSharpModulePi}",
+              "createOptions": {}
+            }
+          },
+          "SimulatedTemperatureSensor": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-simulated-temperature-sensor:1.0",
+              "createOptions": {}
+            }
+          },
+          "ExtraCSharpModulePi": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.ExtraCSharpModulePi}",
+              "createOptions": {}
+            }
+          }
+        }
+      }
+    },
+    "$edgeHub": {
+      "properties.desired": {
+        "schemaVersion": "1.0",
+        "routes": {
+          "sensorToCSharpModulePi": "FROM /messages/modules/SimulatedTemperatureSensor/outputs/temperatureOutput INTO BrokeredEndpoint(\"/modules/CSharpModulePi/inputs/input1\")",
+          "CSharpModulePiToIoTHub": "FROM /messages/modules/CSharpModulePi/outputs/temperatureOutput1 INTO $upstream",
+          "CSharpModulePiToExtraCSharpModulePi": "FROM /messages/modules/CSharpModulePi/outputs/temperatureOutput2 INTO BrokeredEndpoint(\"/modules/ExtraCSharpModulePi/inputs/input1\")",
+          "ExtraCSharpModulePiToIoTHub": "FROM /messages/modules/ExtraCSharpModulePi/outputs/* INTO $upstream"
+        },
+        "storeAndForwardConfiguration": {
+          "timeToLiveSecs": 7200
+        }
+      }
+    },
+    "CSharpModulePi": {
+      "properties.desired": {
+        "TemperatureThreshold": 25
+      }
+    },
+    "ExtraCSharpModulePi": {
+      "properties.desired": {
+        "HumidityFilter": 25
+      }
+    }
+  }
+}
